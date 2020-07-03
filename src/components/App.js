@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import {
@@ -13,6 +13,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Grid,
 } from "@material-ui/core";
 import {
   Menu,
@@ -23,6 +24,7 @@ import {
   Wallpaper,
 } from "@material-ui/icons";
 import Uploader from "./Uploader";
+import Resizer from "./Resizer";
 
 const drawerWidth = 240;
 
@@ -97,7 +99,8 @@ const useStyles = makeStyles((theme) => ({
 export default function App() {
   const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [uploads, setUploads] = useState([]);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -178,7 +181,17 @@ export default function App() {
       </Drawer>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <Uploader />
+
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Uploader uploads={uploads} setUploads={setUploads} />
+          </Grid>
+          {uploads.length ? (
+            <Grid item xs={12}>
+              <Resizer />
+            </Grid>
+          ) : null}
+        </Grid>
       </main>
     </div>
   );
