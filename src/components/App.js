@@ -1,23 +1,26 @@
 import React, { useState } from "react";
-import { Grid } from "@material-ui/core";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+
 import Layout from "./Layout";
 import Uploader from "./Uploader";
-import Resizer from "./Resizer";
+import Images from "./Images";
 
 export default function App() {
   const [uploads, setUploads] = useState([]);
+  const uploaderComponent = (
+    <Uploader uploads={uploads} setUploads={setUploads} />
+  );
   return (
-    <Layout>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Uploader uploads={uploads} setUploads={setUploads} />
-        </Grid>
-        {uploads.length ? (
-          <Grid item xs={12}>
-            <Resizer />
-          </Grid>
-        ) : null}
-      </Grid>
-    </Layout>
+    <Router>
+      <Layout>
+        <Switch>
+          <Route path="/upload">{uploaderComponent}</Route>
+          <Route path="/images">
+            <Images />
+          </Route>
+          <Route path="/">{uploaderComponent}</Route>
+        </Switch>
+      </Layout>
+    </Router>
   );
 }

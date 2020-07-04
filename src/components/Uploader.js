@@ -2,6 +2,7 @@ import React from "react";
 import { Grid, Paper } from "@material-ui/core";
 import { DropzoneAreaBase } from "material-ui-dropzone";
 import Preview from "./Preview";
+import Resizer from "./Resizer";
 
 export default function Uploader({ uploads, setUploads }) {
   return (
@@ -33,6 +34,11 @@ export default function Uploader({ uploads, setUploads }) {
       <Grid item xs={12}>
         <Preview uploads={uploads} setUploads={setUploads} />
       </Grid>
+      {uploads.length ? (
+        <Grid item xs={12}>
+          <Resizer />
+        </Grid>
+      ) : null}
     </Grid>
   );
 }

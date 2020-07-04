@@ -22,6 +22,7 @@ import {
   Image,
   Wallpaper,
 } from "@material-ui/icons";
+import { Link, withRouter } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -91,12 +92,20 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
   },
+  active: {
+    color: theme.palette.primary.light,
+  },
+  link: {
+    textDecoration: "none",
+    color: "#000",
+  },
 }));
 
-export default function Layout({ children }) {
+function Layout({ children, location }) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const { pathname } = location;
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -156,23 +165,51 @@ export default function Layout({ children }) {
         </div>
         <Divider />
         <List>
-          {[{ label: "Upload", icon: <CloudUpload /> }].map(
-            ({ label, icon }) => (
-              <ListItem button key={label}>
-                <ListItemIcon>{icon}</ListItemIcon>
-                <ListItemText primary={label} />
-              </ListItem>
+          {[{ label: "Upload", icon: <CloudUpload />, path: "/upload" }].map(
+            ({ label, icon, path }) => (
+              <Link to={path} key={label} className={classes.link}>
+                <ListItem button>
+                  <ListItemIcon
+                    className={
+                      pathname === "/" || pathname === "/upload"
+                        ? classes.active
+                        : ""
+                    }
+                  >
+                    {icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    className={
+                      pathname === "/" || pathname === "/upload"
+                        ? classes.active
+                        : ""
+                    }
+                    primary={label}
+                  />
+                </ListItem>
+              </Link>
             )
           )}
         </List>
         <Divider />
         <List>
-          {[{ label: "Images", icon: <Image /> }].map(({ label, icon }) => (
-            <ListItem button key={label}>
-              <ListItemIcon>{icon}</ListItemIcon>
-              <ListItemText primary={label} />
-            </ListItem>
-          ))}
+          {[{ label: "Images", icon: <Image />, path: "/images" }].map(
+            ({ label, icon, path }) => (
+              <Link to={path} key={label} className={classes.link}>
+                <ListItem button>
+                  <ListItemIcon
+                    className={pathname === "/images" ? classes.active : ""}
+                  >
+                    {icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    className={pathname === "/images" ? classes.active : ""}
+                    primary={label}
+                  />
+                </ListItem>
+              </Link>
+            )
+          )}
         </List>
       </Drawer>
       <main className={classes.content}>
@@ -182,3 +219,5 @@ export default function Layout({ children }) {
     </div>
   );
 }
+
+export default withRouter(Layout);
