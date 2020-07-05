@@ -9,6 +9,7 @@ import {
   uploadImages,
   fetchResizeStatus,
   fetchUploadedStatus,
+  fetchImage,
 } from "../services/api";
 import { uploadProgressStream } from "../services/io";
 
@@ -29,8 +30,8 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    console.log("images", images, "uploadedImages", uploadedImages);
-  }, [images, uploadedImages]);
+    if (!uploads.length) setUploadProgress(undefined);
+  }, [uploads]);
 
   useEffect(() => {
     if (uploadProgress && uploadProgress === 100) {
@@ -48,8 +49,16 @@ const App = () => {
     fetchResizeStatus(setImages);
   };
 
+  const getImage = (data, state, setState) => {
+    fetchImage(data, state, setState);
+  };
+
   const resize = () => {
-    uploadImages({ uploads, visibility, resizeTo }, setUploadedImages);
+    uploadImages(
+      { uploads, visibility, resizeTo },
+      setUploadedImages,
+      setUploads
+    );
     setUploadProgress(0);
   };
 
@@ -76,9 +85,12 @@ const App = () => {
           <Route exact path="/images">
             <Images
               images={images}
+              setImages={setImages}
               uploadedImages={uploadedImages}
+              setUploadedImages={setUploadedImages}
               resizeStatus={resizeStatus}
               uploadedStatus={uploadedStatus}
+              getImage={getImage}
             />
           </Route>
           <Route path="/">{uploaderComponent}</Route>

@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
-import Backdrop from "@material-ui/core/Backdrop";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Button from "@material-ui/core/Button";
+import {
+  Backdrop,
+  CircularProgress,
+  Grid,
+  Typography,
+  Divider,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import Preview from "./Preview";
 
 const useStyles = makeStyles((theme) => ({
   backdrop: {
@@ -11,9 +16,17 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Images = ({ images, uploadedImages, resizeStatus, uploadedStatus }) => {
+const Images = ({
+  images,
+  setImages,
+  uploadedImages,
+  setUploadedImages,
+  resizeStatus,
+  uploadedStatus,
+  getImage,
+}) => {
   const classes = useStyles();
-  const [open, setOpen] = useState(true);
+  const [loadedUploadedImages, setLoadedUploadedImages] = useState(true);
 
   useEffect(() => {
     if (!images.length) resizeStatus();
@@ -22,27 +35,49 @@ const Images = ({ images, uploadedImages, resizeStatus, uploadedStatus }) => {
 
   useEffect(() => {
     if (images.length) {
-      console.log("images", images);
+      images.map(({ Key, url }, index) => {
+        if (!url)
+          setTimeout(() => {
+            getImage({ key: Key, index }, images, setImages);
+          }, 2000);
+      });
     }
     if (uploadedImages.length) {
-      console.log("uploadedImages", uploadedImages);
+      uploadedImages.map(({ Key, url }, index) => {
+        if (!url)
+          setTimeout(() => {
+            getImage({ key: Key, index }, uploadedImages, setUploadedImages);
+          }, 2000);
+      });
     }
+    setTimeout(() => {
+      if (!uploadedImages.length) setLoadedUploadedImages(false);
+    }, 3000);
   }, [images, uploadedImages]);
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-  const handleToggle = () => {
-    setOpen(!open);
-  };
 
   return (
     <div>
-      <Button variant="outlined" color="primary" onClick={handleToggle}>
-        Show backdrop
-      </Button>
-      <Backdrop className={classes.backdrop} open={open} onClick={handleClose}>
-        <CircularProgress color="inherit" />
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Typography variant="h4" noWrap>
+            Original Images
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Preview images={uploadedImages} height={320} />
+        </Grid>
+        <Divider variant="fullWidth" />
+        <Grid item xs={12}>
+          <Typography variant="h4" noWrap>
+            Resized Images
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <Preview images={images} height={320} />
+        </Grid>
+      </Grid>
+      <Backdrop className={classes.backdrop} open={loadedUploadedImages}>
+        <CircularProgress color="secondary" />
       </Backdrop>
     </div>
   );
