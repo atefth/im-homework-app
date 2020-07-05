@@ -5,7 +5,7 @@ const httpLayer = axios.create({
   withCredentials: true,
 });
 
-const uploadImages = ({ uploads, visibility, resizeTo }) => {
+const uploadImages = ({ uploads, visibility, resizeTo }, setUploadedImages) => {
   const url = `${API_ENDPOINT}/upload`;
 
   const formData = new FormData();
@@ -26,15 +26,32 @@ const uploadImages = ({ uploads, visibility, resizeTo }) => {
       data: formData,
       headers,
     })
-    .then((data) => {
-      console.log(data);
+    .then(({ data }) => {
+      setUploadedImages(data);
     })
     .catch((error) => console.log(error));
 };
 
-const fetchStatus = () => {
-  const url = `${API_ENDPOINT}/images`;
-  return httpLayer.get(url);
+const fetchResizeStatus = (setImages) => {
+  const url = `${API_ENDPOINT}/images/resized`;
+  return httpLayer
+    .get(url)
+    .then(({ data }) => {
+      const { Contents } = data.data;
+      setImages(Contents);
+    })
+    .catch((error) => console.log(error));
 };
 
-export { uploadImages, fetchStatus };
+const fetchUploadedStatus = (setUploadedImages) => {
+  const url = `${API_ENDPOINT}/images/uploaded`;
+  return httpLayer
+    .get(url)
+    .then(({ data }) => {
+      const { Contents } = data.data;
+      setUploadedImages(Contents);
+    })
+    .catch((error) => console.log(error));
+};
+
+export { uploadImages, fetchResizeStatus, fetchUploadedStatus };

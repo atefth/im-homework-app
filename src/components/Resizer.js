@@ -76,19 +76,19 @@ export default function Resizer({
               className={resizeTo === 0.25 ? classes.btnActive : classes.btn}
               onClick={() => beginUpload(0.25)}
             >
-              25% Smaller
+              75 X 75
             </Button>
             <Button
               className={resizeTo === 0.5 ? classes.btnActive : classes.btn}
               onClick={() => beginUpload(0.5)}
             >
-              50% Smaller
+              175 X 175
             </Button>
             <Button
               className={resizeTo === 0.75 ? classes.btnActive : classes.btn}
               onClick={() => beginUpload(0.75)}
             >
-              75% Smaller
+              250 X 250
             </Button>
           </ButtonGroup>
         </Grid>

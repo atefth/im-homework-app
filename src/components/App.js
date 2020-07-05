@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Router, Switch, Route, Redirect } from "react-router-dom";
+import { Router, Switch, Route } from "react-router-dom";
 import history from "../utils/history";
 
 import Layout from "./Layout";
 import Uploader from "./Uploader";
 import Images from "./Images";
-import { uploadImages, fetchStatus } from "../services/api";
+import {
+  uploadImages,
+  fetchResizeStatus,
+  fetchUploadedStatus,
+} from "../services/api";
 import { uploadProgressStream } from "../services/io";
 
 const App = () => {
   const [uploads, setUploads] = useState([]);
+  const [uploadedImages, setUploadedImages] = useState([]);
   const [visibility, setVisibility] = useState(false);
   const [resizeTo, setResizeTo] = useState(0.5);
   const [uploadProgress, setUploadProgress] = useState(undefined);
@@ -24,14 +29,8 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    if (history.location.pathname === "/images") {
-      resizeStatus();
-    }
-  }, [history]);
-
-  useEffect(() => {
-    console.log(images);
-  }, [images]);
+    console.log("images", images, "uploadedImages", uploadedImages);
+  }, [images, uploadedImages]);
 
   useEffect(() => {
     if (uploadProgress && uploadProgress === 100) {
@@ -41,16 +40,16 @@ const App = () => {
     }
   }, [uploadProgress]);
 
+  const uploadedStatus = () => {
+    fetchUploadedStatus(setUploadedImages);
+  };
+
   const resizeStatus = () => {
-    fetchStatus()
-      .then(({ data }) => {
-        setImages(data);
-      })
-      .catch((error) => console.log(error));
+    fetchResizeStatus(setImages);
   };
 
   const resize = () => {
-    uploadImages({ uploads, visibility, resizeTo });
+    uploadImages({ uploads, visibility, resizeTo }, setUploadedImages);
     setUploadProgress(0);
   };
 
@@ -66,6 +65,7 @@ const App = () => {
       resize={resize}
     />
   );
+
   return (
     <Router history={history}>
       <Layout history={history}>
@@ -74,7 +74,12 @@ const App = () => {
             {uploaderComponent}
           </Route>
           <Route exact path="/images">
-            <Images />
+            <Images
+              images={images}
+              uploadedImages={uploadedImages}
+              resizeStatus={resizeStatus}
+              uploadedStatus={uploadedStatus}
+            />
           </Route>
           <Route path="/">{uploaderComponent}</Route>
         </Switch>
