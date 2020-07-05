@@ -22,7 +22,7 @@ import {
   Image,
   Wallpaper,
 } from "@material-ui/icons";
-import { Link, withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -101,10 +101,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Layout({ children, location }) {
+function Layout({ children, history }) {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const { location } = history;
   const { pathname } = location;
 
   const handleDrawerOpen = () => {
@@ -220,4 +221,4 @@ function Layout({ children, location }) {
   );
 }
 
-export default withRouter(Layout);
+export default Layout;

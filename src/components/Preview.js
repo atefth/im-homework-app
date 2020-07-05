@@ -24,6 +24,9 @@ const useStyles = makeStyles((theme) => ({
   gridList: {
     flexWrap: "nowrap",
     transform: "translateZ(0)",
+    "li:only-child": {
+      width: "100%;",
+    },
   },
   title: {
     fontSize: "13px",
