@@ -5,7 +5,8 @@ import history from "../utils/history";
 import Layout from "./Layout";
 import Uploader from "./Uploader";
 import Images from "./Images";
-import { uploadProgressStream, uploadImages } from "../services/api";
+import { uploadImages, fetchStatus } from "../services/api";
+import { uploadProgressStream } from "../services/io";
 
 const App = () => {
   const [uploads, setUploads] = useState([]);
@@ -13,6 +14,7 @@ const App = () => {
   const [resizeTo, setResizeTo] = useState(0.5);
   const [uploadProgress, setUploadProgress] = useState(undefined);
   const [resizeProgress, setResizeProgress] = useState(0);
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     uploadProgressStream(({ progress }) => {
@@ -22,6 +24,16 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    if (history.location.pathname === "/images") {
+      resizeStatus();
+    }
+  }, [history]);
+
+  useEffect(() => {
+    console.log(images);
+  }, [images]);
+
+  useEffect(() => {
     if (uploadProgress && uploadProgress === 100) {
       setTimeout(() => {
         history.push("/images");
@@ -29,7 +41,15 @@ const App = () => {
     }
   }, [uploadProgress]);
 
-  const uploadToS3 = () => {
+  const resizeStatus = () => {
+    fetchStatus()
+      .then(({ data }) => {
+        setImages(data);
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const resize = () => {
     uploadImages({ uploads, visibility, resizeTo });
     setUploadProgress(0);
   };
@@ -43,7 +63,7 @@ const App = () => {
       resizeTo={resizeTo}
       setResizeTo={setResizeTo}
       uploadProgress={uploadProgress}
-      uploadToS3={uploadToS3}
+      resize={resize}
     />
   );
   return (

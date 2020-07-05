@@ -12,7 +12,7 @@ export default function Uploader({
   resizeTo,
   setResizeTo,
   uploadProgress,
-  uploadToS3,
+  resize,
 }) {
   return (
     <Grid container spacing={3}>
@@ -62,7 +62,7 @@ export default function Uploader({
             visibility={visibility}
             setVisibility={setVisibility}
             setResizeTo={setResizeTo}
-            uploadToS3={uploadToS3}
+            resize={resize}
           />
         </Grid>
       ) : null}

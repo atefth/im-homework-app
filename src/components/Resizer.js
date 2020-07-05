@@ -33,12 +33,12 @@ export default function Resizer({
   setVisibility,
   resizeTo,
   setResizeTo,
-  uploadToS3,
+  resize,
 }) {
   const classes = useStyles();
   const beginUpload = (size) => {
     setResizeTo(size);
-    uploadToS3();
+    resize();
   };
 
   return (

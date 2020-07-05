@@ -1,12 +1,9 @@
-import openSocket from "socket.io-client";
 import axios from "axios";
 import { API_ENDPOINT } from "../config";
 
-const socket = openSocket("http://localhost:3001");
-
-const uploadProgressStream = (cb) => {
-  socket.on("uploadProgress", cb);
-};
+const httpLayer = axios.create({
+  withCredentials: true,
+});
 
 const uploadImages = ({ uploads, visibility, resizeTo }) => {
   const url = `${API_ENDPOINT}/upload`;
@@ -22,7 +19,7 @@ const uploadImages = ({ uploads, visibility, resizeTo }) => {
     "content-type": "multipart/form-data",
   };
 
-  axios
+  httpLayer
     .request({
       method: "post",
       url,
@@ -31,7 +28,13 @@ const uploadImages = ({ uploads, visibility, resizeTo }) => {
     })
     .then((data) => {
       console.log(data);
-    });
+    })
+    .catch((error) => console.log(error));
 };
 
-export { uploadProgressStream, uploadImages };
+const fetchStatus = () => {
+  const url = `${API_ENDPOINT}/images`;
+  return httpLayer.get(url);
+};
+
+export { uploadImages, fetchStatus };
