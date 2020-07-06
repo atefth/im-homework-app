@@ -35,7 +35,9 @@ const Images = ({ images, setImages, getStatus, getImageUrl, redirected }) => {
 
   useEffect(() => {
     if (images && images.length && fetchingUrls) {
-      fetchUrls();
+      setTimeout(() => {
+        fetchUrls();
+      }, 2000);
     }
   }, [images]);
 

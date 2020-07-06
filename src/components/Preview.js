@@ -8,8 +8,8 @@ import {
   Typography,
   CircularProgress,
 } from "@material-ui/core";
-import { Skeleton } from "@material-ui/lab";
 import { DeleteRounded, GetApp } from "@material-ui/icons";
+import ImageSkeleton from "./ImageSkeleton";
 
 export default function Preview({
   uploads,
@@ -104,8 +104,8 @@ export default function Preview({
         </GridList>
       ) : images && images.length ? (
         <GridList className={classes.gridList} cols={images.length}>
-          {images.map((image) => {
-            if (image && image[`${urlName}Key`]) {
+          {images.map((image, index) => {
+            if (image && image[`${urlName}Key`] && image[`${urlName}Url`]) {
               const key = image[`${urlName}Key`];
               const size = image[`${urlName}Size`];
               const url = image[`${urlName}Url`];
@@ -145,6 +145,8 @@ export default function Preview({
                   />
                 </GridListTile>
               );
+            } else {
+              return <ImageSkeleton key={index} />;
             }
           })}
         </GridList>
