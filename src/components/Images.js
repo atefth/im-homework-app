@@ -21,7 +21,7 @@ const Images = ({ images, setImages, getStatus, getImageUrl, redirected }) => {
   const [fetchingUrls, setFetchingUrls] = useState(true);
 
   useEffect(() => {
-    if (!redirected) {
+    if (!redirected && !images.length) {
       (async () => {
         const data = await getStatus();
         if (data.length) {
