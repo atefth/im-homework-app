@@ -5,29 +5,26 @@ import history from "../utils/history";
 import Layout from "./Layout";
 import Uploader from "./Uploader";
 import Images from "./Images";
-import {
-  uploadImages,
-  fetchResizeStatus,
-  fetchUploadedStatus,
-  fetchImage,
-} from "../services/api";
-import { uploadProgressStream } from "../services/io";
+import { uploadImages, fetchStatus, fetchImageUrl } from "../services/api";
+import { uploadProgressStream, resizedImageStream } from "../services/io";
 
 const App = () => {
   const [uploads, setUploads] = useState([]);
-  const [uploadedImages, setUploadedImages] = useState([]);
   const [visibility, setVisibility] = useState(false);
   const [resizeTo, setResizeTo] = useState(0.5);
   const [uploadProgress, setUploadProgress] = useState(undefined);
-  const [resizeProgress, setResizeProgress] = useState(0);
   const [images, setImages] = useState([]);
+  const [redirected, setRedirected] = useState(false);
 
   useEffect(() => {
     uploadProgressStream(({ progress }) => {
       const rounded = Math.round(progress);
       setUploadProgress(rounded > 100 ? 100 : rounded);
     });
-  }, []);
+    resizedImageStream((data) => {
+      updateResizedUrl(data);
+    });
+  });
 
   useEffect(() => {
     if (!uploads.length) setUploadProgress(undefined);
@@ -36,29 +33,32 @@ const App = () => {
   useEffect(() => {
     if (uploadProgress && uploadProgress === 100) {
       setTimeout(() => {
+        setRedirected(true);
         history.push("/images");
-      }, 5000);
+      }, 2000);
     }
   }, [uploadProgress]);
 
-  const uploadedStatus = () => {
-    fetchUploadedStatus(setUploadedImages);
-  };
-
-  const resizeStatus = () => {
-    fetchResizeStatus(setImages);
-  };
-
-  const getImage = (data, state, setState) => {
-    fetchImage(data, state, setState);
+  const updateResizedUrl = ({ originalKey, resizedKey }) => {
+    images.map(async (data, index) => {
+      if (
+        data.originalKey === originalKey &&
+        !data.resizedKey &&
+        !data.resizedUrl
+      ) {
+        const image = { ...data, resizedKey };
+        image.resizedUrl = await fetchImageUrl(resizedKey);
+        setImages([
+          ...images.slice(0, index),
+          image,
+          ...images.slice(index + 1),
+        ]);
+      }
+    });
   };
 
   const resize = () => {
-    uploadImages(
-      { uploads, visibility, resizeTo },
-      setUploadedImages,
-      setUploads
-    );
+    uploadImages({ uploads, visibility, resizeTo }, setImages, setUploads);
     setUploadProgress(0);
   };
 
@@ -86,11 +86,9 @@ const App = () => {
             <Images
               images={images}
               setImages={setImages}
-              uploadedImages={uploadedImages}
-              setUploadedImages={setUploadedImages}
-              resizeStatus={resizeStatus}
-              uploadedStatus={uploadedStatus}
-              getImage={getImage}
+              getStatus={fetchStatus}
+              getImageUrl={fetchImageUrl}
+              redirected={redirected}
             />
           </Route>
           <Route path="/">{uploaderComponent}</Route>

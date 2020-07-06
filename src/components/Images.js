@@ -16,44 +16,46 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Images = ({
-  images,
-  setImages,
-  uploadedImages,
-  setUploadedImages,
-  resizeStatus,
-  uploadedStatus,
-  getImage,
-}) => {
+const Images = ({ images, setImages, getStatus, getImageUrl, redirected }) => {
   const classes = useStyles();
-  const [loadedUploadedImages, setLoadedUploadedImages] = useState(true);
+  const [fetchingUrls, setFetchingUrls] = useState(true);
 
   useEffect(() => {
-    if (!images.length) resizeStatus();
-    if (!uploadedImages.length) uploadedStatus();
+    if (!redirected) {
+      (async () => {
+        const data = await getStatus();
+        if (data.length) {
+          setImages(data);
+        } else {
+          setFetchingUrls(false);
+        }
+      })();
+    }
   }, []);
 
   useEffect(() => {
-    if (images.length) {
-      images.map(({ Key, url }, index) => {
-        if (!url)
-          setTimeout(() => {
-            getImage({ key: Key, index }, images, setImages);
-          }, 2000);
-      });
+    if (images && images.length && fetchingUrls) {
+      fetchUrls();
     }
-    if (uploadedImages.length) {
-      uploadedImages.map(({ Key, url }, index) => {
-        if (!url)
-          setTimeout(() => {
-            getImage({ key: Key, index }, uploadedImages, setUploadedImages);
-          }, 2000);
-      });
-    }
-    setTimeout(() => {
-      if (!uploadedImages.length) setLoadedUploadedImages(false);
-    }, 3000);
-  }, [images, uploadedImages]);
+  }, [images]);
+
+  const fetchUrls = async () => {
+    const promises = images.map(async (data, index) => {
+      const { originalKey, originalUrl, resizedKey, resizedUrl } = data;
+      const image = { ...data };
+      if (!originalUrl && originalKey) {
+        image.originalUrl = await getImageUrl(originalKey);
+      }
+      if (!resizedUrl && resizedKey && !redirected) {
+        image.resizedUrl = await getImageUrl(resizedKey);
+      }
+      return Promise.resolve(image);
+    });
+    setFetchingUrls(false);
+    Promise.all(promises).then((imagesWithUrls) => {
+      setImages(imagesWithUrls);
+    });
+  };
 
   return (
     <div>
@@ -64,7 +66,7 @@ const Images = ({
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Preview images={uploadedImages} height={320} />
+          <Preview images={images} height={320} urlName="original" />
         </Grid>
         <Divider variant="fullWidth" />
         <Grid item xs={12}>
@@ -73,10 +75,10 @@ const Images = ({
           </Typography>
         </Grid>
         <Grid item xs={12}>
-          <Preview images={images} height={320} />
+          <Preview images={images} height={320} urlName="resized" />
         </Grid>
       </Grid>
-      <Backdrop className={classes.backdrop} open={loadedUploadedImages}>
+      <Backdrop className={classes.backdrop} open={fetchingUrls}>
         <CircularProgress color="secondary" />
       </Backdrop>
     </div>

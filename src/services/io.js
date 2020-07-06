@@ -5,4 +5,8 @@ const uploadProgressStream = (cb) => {
   socket.on("uploadProgress", cb);
 };
 
-export { uploadProgressStream };
+const resizedImageStream = (cb) => {
+  socket.on("resizedImage", cb);
+};
+
+export { uploadProgressStream, resizedImageStream };

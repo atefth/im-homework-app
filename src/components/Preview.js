@@ -11,7 +11,13 @@ import {
 import { Skeleton } from "@material-ui/lab";
 import { DeleteRounded, GetApp } from "@material-ui/icons";
 
-export default function Preview({ uploads, setUploads, images, height }) {
+export default function Preview({
+  uploads,
+  setUploads,
+  images,
+  height,
+  urlName,
+}) {
   const useStyles = makeStyles((theme) => ({
     root: {
       display: "flex",
@@ -63,11 +69,11 @@ export default function Preview({ uploads, setUploads, images, height }) {
   return (
     <div className={classes.root}>
       {uploads && uploads.length ? (
-        <GridList className={classes.gridList} cols={5}>
+        <GridList className={classes.gridList} cols={uploads.length}>
           {uploads.map(({ data, file }, index) => {
-            const { lastModified, name, size } = file;
+            const { name, size } = file;
             return (
-              <GridListTile key={lastModified}>
+              <GridListTile key={`${name}-${size}`}>
                 <img src={data} alt={name} />
                 <GridListTileBar
                   title={name}
@@ -97,44 +103,49 @@ export default function Preview({ uploads, setUploads, images, height }) {
           })}
         </GridList>
       ) : images && images.length ? (
-        <GridList className={classes.gridList} cols={5}>
-          {images.map(({ Key, Size, LastModified, url }, index) => {
-            const fileName = Key.split("/").slice(1).join("");
-            return (
-              <GridListTile
-                className={classes.gridTile}
-                key={`${fileName}-${Size}`}
-              >
-                <img src={url} alt={fileName} />
-                <GridListTileBar
-                  title={fileName}
-                  subtitle={<span>Size: {Size}</span>}
-                  classes={{
-                    root: classes.titleBar,
-                    title: classes.title,
-                    subtitle: classes.subtitle,
-                  }}
-                  actionIcon={
-                    url ? (
-                      <IconButton
-                        aria-label={`Download ${fileName}`}
-                        className={classes.icon}
-                        onClick={() => {
-                          const link = document.createElement("a");
-                          link.href = url;
-                          link.download = url;
-                          link.click();
-                        }}
-                      >
-                        <GetApp />
-                      </IconButton>
-                    ) : (
-                      <CircularProgress color="primary" />
-                    )
-                  }
-                />
-              </GridListTile>
-            );
+        <GridList className={classes.gridList} cols={images.length}>
+          {images.map((image) => {
+            if (image && image[`${urlName}Key`]) {
+              const key = image[`${urlName}Key`];
+              const size = image[`${urlName}Size`];
+              const url = image[`${urlName}Url`];
+              const fileName = key.split("/").slice(1).join("");
+              return (
+                <GridListTile
+                  className={classes.gridTile}
+                  key={`${fileName}-${size}`}
+                >
+                  <img src={url} alt={fileName} />
+                  <GridListTileBar
+                    title={fileName}
+                    subtitle={<span>Size: {size}</span>}
+                    classes={{
+                      root: classes.titleBar,
+                      title: classes.title,
+                      subtitle: classes.subtitle,
+                    }}
+                    actionIcon={
+                      url ? (
+                        <IconButton
+                          aria-label={`Download ${fileName}`}
+                          className={classes.icon}
+                          onClick={() => {
+                            const link = document.createElement("a");
+                            link.href = url;
+                            link.download = url;
+                            link.click();
+                          }}
+                        >
+                          <GetApp />
+                        </IconButton>
+                      ) : (
+                        <CircularProgress color="primary" />
+                      )
+                    }
+                  />
+                </GridListTile>
+              );
+            }
           })}
         </GridList>
       ) : (
