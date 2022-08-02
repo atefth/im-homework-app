@@ -1,9 +1,9 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import {
-  GridList,
-  GridListTile,
-  GridListTileBar,
+  ImageList,
+  ImageListItem,
+  ImageListItemBar,
   IconButton,
   Typography,
   CircularProgress,
@@ -30,8 +30,8 @@ export default function Preview({
       borderRadius: "8px",
       padding: "8px",
     },
-    gridList: {
-      flexWrap: "nowrap",
+    ImageList: {
+      flexWrap: "wrap",
       transform: "translateZ(0)",
       "li:only-child": {
         width: "100%;",
@@ -39,7 +39,7 @@ export default function Preview({
     },
     gridTile: {
       height: height ? `${height - 20}px !important` : "100%",
-      "& > .MuiGridListTile-tile": {
+      "& > .MuiImageListTile-tile": {
         height: height ? "inherit" : "100%",
       },
     },
@@ -69,13 +69,13 @@ export default function Preview({
   return (
     <div className={classes.root}>
       {uploads && uploads.length ? (
-        <GridList className={classes.gridList} cols={uploads.length}>
+        <ImageList className={classes.ImageList} cols={uploads.length}>
           {uploads.map(({ data, file }, index) => {
             const { name, size } = file;
             return (
-              <GridListTile key={`${name}-${size}`}>
+              <ImageListItem key={`${name}-${size}`}>
                 <img src={data} alt={name} />
-                <GridListTileBar
+                <ImageListItemBar
                   title={name}
                   subtitle={<span>Size: {size}</span>}
                   classes={{
@@ -98,12 +98,12 @@ export default function Preview({
                     </IconButton>
                   }
                 />
-              </GridListTile>
+              </ImageListItem>
             );
           })}
-        </GridList>
+        </ImageList>
       ) : images && images.length ? (
-        <GridList className={classes.gridList} cols={images.length}>
+        <ImageList className={classes.ImageList} cols={images.length}>
           {images.map((image, index) => {
             if (image && image[`${urlName}Key`] && image[`${urlName}Url`]) {
               const key = image[`${urlName}Key`];
@@ -111,12 +111,12 @@ export default function Preview({
               const url = image[`${urlName}Url`];
               const fileName = key.split("/").slice(1).join("");
               return (
-                <GridListTile
+                <ImageListItem
                   className={classes.gridTile}
                   key={`${fileName}-${size}`}
                 >
                   <img src={url} alt={fileName} />
-                  <GridListTileBar
+                  <ImageListItemBar
                     title={fileName}
                     subtitle={<span>Size: {size}</span>}
                     classes={{
@@ -143,13 +143,13 @@ export default function Preview({
                       )
                     }
                   />
-                </GridListTile>
+                </ImageListItem>
               );
             } else {
               return <ImageSkeleton key={index} />;
             }
           })}
-        </GridList>
+        </ImageList>
       ) : (
         <Typography variant="h6" noWrap className={classes.placeholder}>
           Image Previews

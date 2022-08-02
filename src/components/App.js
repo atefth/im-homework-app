@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Router, Switch, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import history from "../utils/history";
 
 import Layout from "./Layout";
@@ -46,7 +46,10 @@ const App = () => {
         !data.resizedKey &&
         !data.resizedUrl
       ) {
-        const image = { ...data, resizedKey };
+        const image = {
+          ...data,
+          resizedKey,
+        };
         image.resizedUrl = await fetchImageUrl(resizedKey);
         setImages([
           ...images.slice(0, index),
@@ -58,7 +61,15 @@ const App = () => {
   };
 
   const resize = () => {
-    uploadImages({ uploads, visibility, resizeTo }, setImages, setUploads);
+    uploadImages(
+      {
+        uploads,
+        visibility,
+        resizeTo,
+      },
+      setImages,
+      setUploads
+    );
     setUploadProgress(0);
   };
 
@@ -76,13 +87,13 @@ const App = () => {
   );
 
   return (
-    <Router history={history}>
-      <Layout history={history}>
-        <Switch>
-          <Route exact path="/upload">
-            {uploaderComponent}
-          </Route>
-          <Route exact path="/images">
+    <Layout history={history}>
+      <Routes>
+        <Route exact path="/upload" element={uploaderComponent} />
+        <Route
+          exact
+          path="/images"
+          element={
             <Images
               images={images}
               setImages={setImages}
@@ -90,11 +101,10 @@ const App = () => {
               getImageUrl={fetchImageUrl}
               redirected={redirected}
             />
-          </Route>
-          <Route path="/">{uploaderComponent}</Route>
-        </Switch>
-      </Layout>
-    </Router>
+          }
+        />
+      </Routes>
+    </Layout>
   );
 };
 
